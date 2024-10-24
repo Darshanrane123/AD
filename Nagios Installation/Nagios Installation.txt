@@ -1,0 +1,57 @@
+##### Nagios Installation #####
+
+Step1: Create Red Hat AWS instance (configure instance by viewing video)
+step2: create folder and set key.pem in that and open cmd from that folder
+step3: Copied SSH link from AWS instance and paste into cmd and enter
+step4: follow following commands:
+
+if connect to the ec2 instance then:
+ 	1. sudo su
+	2. sudo dnf install wget
+	3. sudo dnf install unzip
+	4. dnf install httpd httpd-tools php gcc glibc glibc-common gd gd-devel make net-snmp openssl-devel -y
+	5. useradd nagios
+	6. usermod -G nagios nagios
+	7. usermod -G nagios apache
+	8. mkdir /root/nagios
+	9. cd /root/nagios
+	10. wget https://assets.nagios.com/downloads/nagioscore/releases/nagios-4.4.9.tar.gz
+	11. wget https://nagios-plugins.org/download/nagios-plugins-2.3.3.tar.gz
+	12. tar -xf nagios-4.4.9.tar.gz
+	13. tar -xf nagios-plugins-2.3.3.tar.gz
+	14. cd nagios-4.4.9/
+	15. ./configure --with-command-group=nagios
+	16. make all
+	17. make install
+	18. make install-init
+	19. make install-commandmode
+	20. make install-config
+	21. make install-webconf
+	22. htpasswd -s -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
+	23. systemctl restart httpd
+	24. cd /root/nagios/nagios-plugins-2.3.3 
+	25. ./configure --with-nagios-user=nagios --with-nagios-group=nagios
+	26. make
+	27. make install
+	28. /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+	29. systemctl enable nagios
+	30. systemctl enable httpd
+	31. systemctl restart nagios
+	32. systemctl status nagios
+
+
+After all the commands then: open browser and type http://{public ip-address of created instance /}/nagios
+Instead if curly brackets add your instance IP Address.
+
+
+
+After installation then type commands:
+	systemctl stop sshd (check services on nagios showing critical for ssh)
+	systemctl status sshd
+	systemctl start sshd
+	
+	systemctl stop httpd(nagios http service will be stop )
+	systemctl start httpd
+
+
+If any error Occur then go to this link for better Information: https://www.atlantic.net/dedicated-server-hosting/how-to-install-and-configure-nagios-on-fedora/

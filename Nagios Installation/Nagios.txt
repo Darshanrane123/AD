@@ -1,0 +1,62 @@
+Task :Install nagios on Ec-2 instance on choosen red hat os
+------------------------------------------------------------------
+1-Just launch a EC2 instance with red Hat os with port 80 open
+2-connect to the instance with ssh cmd and install it by following url
+Be a super user on aws by doing sudo su
+https://www.atlantic.net/dedicated-server-hosting/how-to-install-and-configure-nagios-on-fedora/
+Above atlantic web site is best suited for red hat os on aws
+url:https://www.tecmint.com/install-nagios-on-rhel-8/
+https://www.appservgrid.com/paw92/index.php/2019/03/14/how-to-install-nagios-4-3-4-on-rhel-centos-and-fedora/
+3-After installations,access it as http://13.233.145.2/nagios/  provide nagiosadmin as username and nagiosadmin as pwd
+4-Now try to install required plugins
+ https://access.redhat.com/documentation/en-us/red_hat_ceph_storage/3/html/monitoring_ceph_for_red_hat_enterprise_linux_with_nagios/nagios-nrpe-installation-ceph-nagios
+ 
+ To check all existing plugins
+   ls /usr/local/nagios/libexec/  on aws ce2 instance
+   
+ cd /usr/local/nagios/etc/objects  on ec-2 to know cfg files
+ 
+ in a file localhost.cfg  add following
+ define host {
+        use                     linux-server  
+        host_name               EC2      
+        alias                   ec-2 Instance 
+        address                 3.109.217.117
+        }
+
+define service {
+
+    use                     local-service           ; Name of service template to use
+    host_name               EC2
+    service_description     PING
+    check_command           check_ping!100.0,20%!500.0,60%
+}
+
+define service {
+            host_name                       EC2
+            service_description             AWS:EC2 MC
+            check_command                   check_http_url!3.109.217.117 -S
+            max_check_attempts              5
+            check_interval                  3
+            retry_interval                  1
+            check_period                    24x7
+            notification_interval           30
+            notification_period             workhours
+    }
+
+
+and in a file commands.cfg
+#chang1
+
+define command {
+        command_name    check_http_url
+        command_line    $USER1$/check_http -I $HOSTADDRESS$ -u $ARG1$
+}
+
+ 
+ 
+ systemctl start nagios.service to start nagios service and the see nagios home page
+
+   
+   
+
